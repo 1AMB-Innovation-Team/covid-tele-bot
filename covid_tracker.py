@@ -8,7 +8,7 @@ Author: liuhh02 https://medium.com/@liuhh02
 import logging
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 import os
-PORT = int(os.environ.get('PORT', 5000))
+PORT = int(os.environ.get('PORT', '6578'))
 
 # Enable logging
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -57,12 +57,12 @@ def main():
 
     # Start the Bot
     
-    '''updater.start_webhook(listen="0.0.0.0",
+    updater.start_webhook(listen="0.0.0.0",
                           port=int(PORT),
                           url_path=TOKEN)
-    updater.bot.setWebhook('https://covidtracker-bot-12.herokuapp.com/' + TOKEN)'''
+    updater.bot.setWebhook('https://covidtracker-bot-12.herokuapp.com/' + TOKEN)
     
-    updater.start_polling()
+    # updater.start_polling()
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
