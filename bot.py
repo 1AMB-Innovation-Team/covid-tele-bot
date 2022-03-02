@@ -149,11 +149,14 @@ def unitName(update: Update, context: CallbackContext) -> None:
     if(len(context.args)==1):
         context.chat_data['unit'] = str(context.args[0])
         # Edit active list
-        bot.edit_message_text(
-            chat_id=update.message.chat_id, 
-            message_id=context.chat_data['ACTIVE'],
-            text=generate_msg_text(Cases, context)
-        )
+        try:
+            bot.edit_message_text(
+                chat_id=context.chat_data['cid'], 
+                message_id=context.chat_data['ACTIVE'],
+                text=generate_msg_text(Cases, context)
+            )
+        except:
+            pass
     bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
     return 
 
