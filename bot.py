@@ -497,10 +497,6 @@ def main() -> None:
     '''Run the bot.'''
     # Create the Updater and pass it your bot's token.
     TOKEN = '5249938330:AAF4vd0RX2Jdx_24vxDz3lSSWPUSWOOLRic'
-    HNAME = 'covidtracker-bot-12'
-    
-    # FROM Heroku
-    PORT = os.environ.get('PORT')
     
     pers = PicklePersistence(filename='case_list.pkl')
     updater = Updater(TOKEN)
@@ -570,13 +566,15 @@ def main() -> None:
     # Start the Bot
     # updater.start_polling()
     # Start the webhook
+    '''
     updater.start_webhook(listen="0.0.0.0",
                           port=int(PORT),
                           url_path=TOKEN,
-                          webhook_url=f"https://{HNAME}.herokuapp.com/{TOKEN}")
+                          webhook_url=f"https://{HNAME}.herokuapp.com/{TOKEN}")'''
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
+    updater.start_polling()
     updater.idle()
 
 
