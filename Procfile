@@ -1,0 +1,1 @@
+web: python3 covid_tracker.py
