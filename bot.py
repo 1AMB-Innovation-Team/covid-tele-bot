@@ -454,11 +454,14 @@ def tdOn(update: Update, context: CallbackContext) -> None:
         Cases = context.chat_data['Cases']
     
     # Edit active list
-    bot.edit_message_text(
-        chat_id=update.message.chat_id, 
-        message_id=context.chat_data['ACTIVE'],
-        text=generate_msg_text(Cases, context)
-    )
+    try:
+        bot.edit_message_text(
+            chat_id=update.message.chat_id, 
+            message_id=context.chat_data['ACTIVE'],
+            text=generate_msg_text(Cases, context)
+        )
+    except:
+        pass
     bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
     return 
 
