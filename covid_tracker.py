@@ -40,7 +40,7 @@ def main():
     # Create the Updater and pass it your bot's token.
     # Make sure to set use_context=True to use the new context based callbacks
     # Post version 12 this will no longer be necessary
-    updater = Updater(TOKEN, use_context=True)
+    updater = Updater(TOKEN)
 
     # Get the dispatcher to register handlers
     dp = updater.dispatcher
@@ -57,12 +57,12 @@ def main():
 
     # Start the Bot
     
-    updater.start_webhook(listen="0.0.0.0",
+    '''updater.start_webhook(listen="0.0.0.0",
                           port=int(PORT),
                           url_path=TOKEN)
-    updater.bot.setWebhook('https://covidtracker-bot-12.herokuapp.com/' + TOKEN)
+    updater.bot.setWebhook('https://covidtracker-bot-12.herokuapp.com/' + TOKEN)'''
     
-    # updater.start_polling()
+    updater.start_polling()
 
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
