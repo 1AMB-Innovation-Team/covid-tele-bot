@@ -25,8 +25,10 @@ from telegram.ext import (
     Filters,
     PicklePersistence,
 )
+from postgrespersistence import PostgresPersistence
 import re
 import os
+import psycopg2
 
 # Enable logging
 logging.basicConfig(
@@ -511,7 +513,11 @@ def main() -> None:
     PORT = os.environ.get('PORT')
     '''Run the bot.'''
     # Create the Updater and pass it your bot's token.
-    pers = PicklePersistence(filename='case_list.pkl')
+    DATABASE_URL = os.environ['DATABASE_URL']
+
+    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
+    
+    pers = PostgresPersistence(url=DATABASE_URL)
     updater = Updater(TOKEN, persistence=pers)
 
     # Get the dispatcher to register handlers
