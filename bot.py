@@ -1,5 +1,4 @@
-# TOKEN:5249938330:AAF4vd0RX2Jdx_24vxDz3lSSWPUSWOOLRic
-TOKEN = '5249938330:AAF4vd0RX2Jdx_24vxDz3lSSWPUSWOOLRic'
+# TOKEN = 5249938330:AAF4vd0RX2Jdx_24vxDz3lSSWPUSWOOLRic
 
 #!/usr/bin/env python
 # pylint: disable=C0116,W0613
@@ -65,8 +64,6 @@ resend_interval = datetime.timedelta(hours = 47)
 unit_name = '12FMD'
 # for error logging
 DEVELOPER_CHAT_ID = 291603849
-
-PORT = int(os.environ.get('PORT', 5000))
 
 def remove_job_if_exists(name: str, context: CallbackContext) -> bool:
     """Remove job with given name. Returns whether job was removed."""
@@ -499,6 +496,12 @@ def error_handler(update: object, context: CallbackContext) -> None:
 def main() -> None:
     '''Run the bot.'''
     # Create the Updater and pass it your bot's token.
+    TOKEN = '5249938330:AAF4vd0RX2Jdx_24vxDz3lSSWPUSWOOLRic'
+    HNAME = 'covidtracker-bot-12'
+    
+    # FROM Heroku
+    PORT = os.environ.get('PORT')
+    
     pers = PicklePersistence(filename='case_list.pkl')
     updater = Updater(TOKEN, persistence=pers, use_context=True)
 
@@ -558,11 +561,11 @@ def main() -> None:
     dispatcher.add_error_handler(error_handler)
 
     # Start the Bot
-    # updater.start_polling()
+    # updater.start_polling()# Start the webhook
     updater.start_webhook(listen="0.0.0.0",
-                            port=int(PORT),
-                            url_path=TOKEN)
-    updater.bot.setWebhook('https://covidtracker-bot-12.herokuapp.com/' + TOKEN)
+                          port=int(PORT),
+                          url_path=TOKEN,
+                          webhook_url=f"https://{NAME}.herokuapp.com/{TOKEN}")
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
