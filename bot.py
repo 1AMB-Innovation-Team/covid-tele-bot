@@ -503,7 +503,7 @@ def main() -> None:
     PORT = os.environ.get('PORT')
     
     pers = PicklePersistence(filename='case_list.pkl')
-    updater = Updater(TOKEN, persistence=pers)
+    updater = Updater(TOKEN)
 
     # Get the dispatcher to register handlers
     dispatcher = updater.dispatcher
