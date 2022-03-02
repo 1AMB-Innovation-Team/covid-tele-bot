@@ -1,1 +1,1 @@
-web: python covid_tracker.py
+web: python bot.py
