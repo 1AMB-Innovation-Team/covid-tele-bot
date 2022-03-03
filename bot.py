@@ -65,6 +65,7 @@ Cases = {
 resend_interval = datetime.timedelta(hours = 47)
 # Unit Name
 unit_name = '12FMD'
+
 # for error logging
 DEVELOPER_CHAT_ID = 291603849
 
@@ -104,6 +105,13 @@ def start(update: Update, context: CallbackContext) -> None:
     return
 
 def sl(update: Update, context: CallbackContext) -> None:
+    if('cid' not in context.chat_data):
+        chat_id = update.message.chat_id
+        context.chat_data['cid'] = chat_id
+        update.message.reply_text(
+            f'Please use /start to begin tracking'
+        )
+        return
     # helper because i didnt want to overload
     sendlist(context)
     return
@@ -123,6 +131,11 @@ def sendlist(context: CallbackContext) -> None:
         text=generate_msg_text(c, context),
         chat_id = chat_id
     ).message_id
+    d = False
+    if('d' in context.chat_data):
+        d=context.chat_data['d']
+    if(d):
+        bot.delete_message(chat_id=chat_id, message_id=context.chat_data['ACTIVE'])
     context.chat_data['ACTIVE']= active_list_id
     # list renewal scheduling
     remove_job_if_exists(str(chat_id), context)
@@ -139,8 +152,10 @@ def help(update: Update, context: CallbackContext) -> None:
         f'12FMD COVID CASE TRACKER\n'
         f'Use /add to add a case and /remove to remove.\n'
         f'Use /cancel to cancel an action midway.\n'
-        f'Use /list to make a new active list.\n'
-        f'Use /td_on and /td_off to enable/disable timed entry deletion'
+        f'Use /list to make a new active list or /clear to clear the current list\n'
+        f'Use /td_on and /td_off to enable/disable timed entry deletion\n'
+        f'Use /d_on and /d_off to enable/disable deletion of previous list\n'
+        f'Use /reset to reset the chat\n'
         f'Use /unit_name (name) to change unit name'
     )
     return
@@ -477,6 +492,46 @@ def tdOff(update: Update, context: CallbackContext) -> None:
     bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
     return 
 
+def dOn(update: Update, context: CallbackContext) -> None:
+    logger.info('delete on')
+    context.chat_data['d'] = True
+    bot = context.bot
+    bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+    return 
+
+def dOff(update: Update, context: CallbackContext) -> None:
+    logger.info('delete off')
+    context.chat_data['d'] = False
+    bot = context.bot
+    bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+    return 
+
+def clear(update: Update, context: CallbackContext) -> None:
+    logger.info('clear list')
+    if('Cases' in context.chat_data):
+        Cases = context.chat_data['Cases']
+    for ctype in range(4):
+        Cases[ct[ctype]].clear()
+    context.chat_data['Cases'] = Cases
+    chatid = context.user_data['cid']
+    msgid = context.chat_data['ACTIVE']
+    # Edit active list
+    bot.edit_message_text(
+        chat_id=chatid, 
+        message_id=msgid,
+        text=generate_msg_text(Cases, context)
+    )
+    bot = context.bot
+    bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+    return 
+
+def reset(update: Update, context: CallbackContext) -> None:
+    logger.info('clear list')
+    context.chat_data.clear()
+    bot = context.bot
+    bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+    bot.send_message(chat_id=update.message.chat_id, text='Chat reset. Please use /start to resume')
+    return 
 
 def error_handler(update: object, context: CallbackContext) -> None:
     """Log the error and send a telegram message to notify the developer."""
@@ -569,9 +624,13 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler('help', help))
     dispatcher.add_handler(CommandHandler('list', sl))
     
+    dispatcher.add_handler(CommandHandler('clear', clear))
+    dispatcher.add_handler(CommandHandler('reset', reset))
     dispatcher.add_handler(CommandHandler('unit_name', unitName))
     dispatcher.add_handler(CommandHandler('td_on', tdOn))
     dispatcher.add_handler(CommandHandler('td_off', tdOff))
+    dispatcher.add_handler(CommandHandler('d_on', tdOn))
+    dispatcher.add_handler(CommandHandler('d_off', tdOff))
     
     #Errors
     dispatcher.add_error_handler(error_handler)
