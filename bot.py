@@ -65,7 +65,7 @@ Cases = {
 resend_interval = datetime.timedelta(hours = 47)
 # Unit Name
 unit_name = '12FMD'
-
+t_offset = 8
 # for error logging
 DEVELOPER_CHAT_ID = 291603849
 
@@ -197,7 +197,7 @@ def generate_category_list(cdict, ctype, context):
         cdate = dateparser.parse(datestr, settings={'DATE_ORDER': 'DMY'})
         day5 = cdate + datetime.timedelta(days=4)
         day7 = cdate + datetime.timedelta(days=6)
-        if(day7<datetime.datetime.now() and td):
+        if(day7<(datetime.datetime.now()+datetime.timedelta(hours=t_offset)) and td):
             outdated.append(rname)
             continue
         cd = cdate.strftime('%d %b')
@@ -227,7 +227,7 @@ def generate_category_list(cdict, ctype, context):
     return clist_text
 
 def generate_msg_text(Cases,con):
-    dtnow = (datetime.datetime.now()+datetime.timedelta(hours=8)).strftime('%d %b %Y - %H%M hrs')
+    dtnow = (datetime.datetime.now()+datetime.timedelta(hours=t_offset)).strftime('%d %b %Y - %H%M hrs')
     unit_name = con.chat_data['unit']
     msg_text = (
         f'{unit_name} Outstanding Covid Incidents Summary\n\n'
@@ -322,7 +322,7 @@ def caseDateHandler(update: Update, context: CallbackContext) -> int:
     cdt = dateparser.parse(cdate, settings={'DATE_ORDER': 'DMY'})
     bot = context.bot
     
-    if(cdt is None) or (cdt>datetime.datetime.now()):
+    if(cdt is None) or (cdt>(datetime.datetime.now()+datetime.timedelta(hours=t_offset))):
         logger.info('User entered invalid date.')
         context.user_data['case_date'] = 'rd'
         prompt_text = 'Invalid date entered. Enter case date in DD/MM/YY format:'
