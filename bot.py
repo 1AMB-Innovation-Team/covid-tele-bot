@@ -200,6 +200,7 @@ def generate_category_list(cdict, ctype, context):
         delete_cutoff = day7
         if(ctype==2 or ctype==3):
             delete_cutoff = day5
+        delete_cutoff = delete_cutoff + datetime.timedelta(days=1)
         if(delete_cutoff<(datetime.datetime.now()+t_offset) and td):
             outdated.append(rname)
             continue
