@@ -1,6 +1,3 @@
-# TOKEN:5249938330:AAF4vd0RX2Jdx_24vxDz3lSSWPUSWOOLRic
-# TOKEN = '5249938330:AAF4vd0RX2Jdx_24vxDz3lSSWPUSWOOLRic'
-
 #!/usr/bin/env python
 # pylint: disable=C0116,W0613
 # This program is dedicated to the public domain under the CC0 license.
@@ -566,18 +563,16 @@ def error_handler(update: object, context: CallbackContext) -> None:
 
 def main() -> None:
     # Set these variable to the appropriate values
-    TOKEN = "5249938330:AAF4vd0RX2Jdx_24vxDz3lSSWPUSWOOLRic"
+    TOKEN = "YOUR_TELEGRAM_TOKEN"
     N = "covidtracker-bot-12"
 
     # Port is given by Heroku
     PORT = os.environ.get('PORT','5555')
     '''Run the bot.'''
     # Create the Updater and pass it your bot's token.
-    DATABASE_URL = os.environ['DATABASE_URL'] #'postgres://fcoiknwokizqha:27e5045aa7b0291c9b91ab044b91ddd2ff8e06be37946ae5c09adfc570da57f3@ec2-3-225-79-57.compute-1.amazonaws.com:5432/d7nrhv19m54qjk'  
+    DATABASE_URL = os.environ['DATABASE_URL']
     DB_URL = DATABASE_URL.replace('postgres','postgresql',1)
-    
-    # conn = psycopg2.connect(dbname='d7nrhv19m54qjk', host='ec2-3-225-79-57.compute-1.amazonaws.com', port=5432, user='fcoiknwokizqha', password='27e5045aa7b0291c9b91ab044b91ddd2ff8e06be37946ae5c09adfc570da57f3', sslmode='require')
-    
+        
     pers = PostgresPersistence(url=DB_URL)
     updater = Updater(TOKEN, persistence=pers)
 
