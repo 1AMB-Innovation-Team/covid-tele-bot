@@ -513,7 +513,7 @@ def main() -> None:
     PORT = os.environ.get('PORT','5555')
     '''Run the bot.'''
     # Create the Updater and pass it your bot's token.
-    DATABASE_URL = 'postgres://fcoiknwokizqha:27e5045aa7b0291c9b91ab044b91ddd2ff8e06be37946ae5c09adfc570da57f3@ec2-3-225-79-57.compute-1.amazonaws.com:5432/d7nrhv19m54qjk'  
+    DATABASE_URL = os.environ['DATABASE_URL'] #'postgres://fcoiknwokizqha:27e5045aa7b0291c9b91ab044b91ddd2ff8e06be37946ae5c09adfc570da57f3@ec2-3-225-79-57.compute-1.amazonaws.com:5432/d7nrhv19m54qjk'  
     DB_URL = DATABASE_URL.replace('postgres','postgresql',1)
     
     # conn = psycopg2.connect(dbname='d7nrhv19m54qjk', host='ec2-3-225-79-57.compute-1.amazonaws.com', port=5432, user='fcoiknwokizqha', password='27e5045aa7b0291c9b91ab044b91ddd2ff8e06be37946ae5c09adfc570da57f3', sslmode='require')
