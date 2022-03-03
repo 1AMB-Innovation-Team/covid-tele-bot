@@ -515,13 +515,13 @@ def clear(update: Update, context: CallbackContext) -> None:
     context.chat_data['Cases'] = Cases
     chatid = context.chat_data['cid']
     msgid = context.chat_data['ACTIVE']
+    bot = context.bot
     # Edit active list
     bot.edit_message_text(
         chat_id=chatid, 
         message_id=msgid,
         text=generate_msg_text(Cases, context)
     )
-    bot = context.bot
     bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
     return 
 
