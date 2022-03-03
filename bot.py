@@ -84,6 +84,7 @@ def start(update: Update, context: CallbackContext) -> None:
     '''Send message on `/start`.'''
     # Get user that sent /start and log his name
     user = update.message.from_user
+    context.chat_data.clear()
     logger.info('User %s started the conversation.', user.first_name)
     
     logger.info('context: %s', context)
