@@ -197,7 +197,10 @@ def generate_category_list(cdict, ctype, context):
         cdate = dateparser.parse(datestr, settings={'DATE_ORDER': 'DMY'})
         day5 = cdate + datetime.timedelta(days=4)
         day7 = cdate + datetime.timedelta(days=6)
-        if(day7<(datetime.datetime.now()+t_offset) and td):
+        delete_cutoff = day7
+        if(ctype==2 or ctype==3):
+            delete_cutoff = day5
+        if(delete_cutoff<(datetime.datetime.now()+t_offset) and td):
             outdated.append(rname)
             continue
         cd = cdate.strftime('%d %b')
