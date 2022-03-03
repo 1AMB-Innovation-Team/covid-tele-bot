@@ -629,8 +629,8 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler('unit_name', unitName))
     dispatcher.add_handler(CommandHandler('td_on', tdOn))
     dispatcher.add_handler(CommandHandler('td_off', tdOff))
-    dispatcher.add_handler(CommandHandler('d_on', tdOn))
-    dispatcher.add_handler(CommandHandler('d_off', tdOff))
+    dispatcher.add_handler(CommandHandler('d_on', dOn))
+    dispatcher.add_handler(CommandHandler('d_off', dOff))
     
     #Errors
     dispatcher.add_error_handler(error_handler)
