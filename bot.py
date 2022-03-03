@@ -292,7 +292,7 @@ def addCaseDate(update: Update, context: CallbackContext) -> int:
     context.user_data['case_name'] = str(cname)
     logger.info('Case submitted with name %s.', str(cname))
     bot = context.bot
-    prompt_text = 'Enter case date in DD/MM/YY format:'
+    prompt_text = 'Enter case date:'
     try:
         bot.edit_message_text(chat_id=update.message.chat_id, message_id=context.user_data['msgid'], text=prompt_text)
     except:
