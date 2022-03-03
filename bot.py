@@ -227,7 +227,7 @@ def generate_category_list(cdict, ctype, context):
     return clist_text
 
 def generate_msg_text(Cases,con):
-    dtnow = datetime.datetime.now().strftime('%d %b %Y - %H%M hrs')
+    dtnow = (datetime.datetime.now()+datetime.timedelta(hours=8)).strftime('%d %b %Y - %H%M hrs')
     unit_name = con.chat_data['unit']
     msg_text = (
         f'{unit_name} Outstanding Covid Incidents Summary\n\n'
