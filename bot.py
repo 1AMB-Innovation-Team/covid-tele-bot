@@ -385,7 +385,7 @@ def remCaseType(update: Update, context: CallbackContext) -> int:
     context.user_data.clear()
     command_msg = update.message.message_id
     com_cid = update.message.chat_id
-    context.user_data['cid'] = com_cid
+    context.chat_data['cid'] = com_cid
     context.user_data['com_msgid'] = command_msg
     '''Show new choice of buttons'''
     keyboard = [
@@ -448,8 +448,8 @@ def remNameHandler(update: Update, context: CallbackContext) -> int:
     logger.info('User entered case name %s.', str(cname))
     
     bot = context.bot
-    bot.delete_message(chat_id=context.user_data['cid'], message_id=context.user_data['msgid'])
-    bot.delete_message(chat_id=context.user_data['cid'], message_id=context.user_data['com_msgid'])
+    bot.delete_message(chat_id=context.chat_data['cid'], message_id=context.user_data['msgid'])
+    bot.delete_message(chat_id=context.chat_data['cid'], message_id=context.user_data['com_msgid'])
     ctype = context.user_data['case_type']
     if('Cases' in context.chat_data):
         Cases = context.chat_data['Cases']
@@ -458,7 +458,7 @@ def remNameHandler(update: Update, context: CallbackContext) -> int:
     
     # Edit active list
     bot.edit_message_text(
-        chat_id=context.user_data['cid'], 
+        chat_id=context.chat_data['cid'], 
         message_id=context.chat_data['ACTIVE'],
         text=generate_msg_text(Cases, context)
     )
@@ -513,7 +513,7 @@ def clear(update: Update, context: CallbackContext) -> None:
     for ctype in range(4):
         Cases[ct[ctype]].clear()
     context.chat_data['Cases'] = Cases
-    chatid = context.user_data['cid']
+    chatid = context.chat_data['cid']
     msgid = context.chat_data['ACTIVE']
     # Edit active list
     bot.edit_message_text(
