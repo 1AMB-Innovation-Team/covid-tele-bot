@@ -83,9 +83,18 @@ def start(update: Update, context: CallbackContext) -> None:
     user = update.message.from_user
     context.chat_data.clear()
     logger.info('User %s started the conversation.', user.first_name)
-    
-    logger.info('context: %s', context)
+    bot = context.bot
     chat_id = update.message.chat_id
+    admins = bot.get_chat_administrators(chat_id)
+    if(bot.id not in [a.user.id for a in admins]):
+        update.message.reply_text(
+            f'Please grant admin permissions to this bot, then use /start to begin tracking'
+        )        
+        logger.info('Bot id %s', bot.id)
+        logger.info('admins %s', str(admins))
+        logger.info('Bot has no admin rights in chat %s', chat_id)
+        return
+    logger.info('context: %s', context)
     # load current case list from persistence store
     if('Cases' not in context.chat_data):
         context.chat_data['Cases'] = Cases
@@ -104,8 +113,6 @@ def start(update: Update, context: CallbackContext) -> None:
 
 def sl(update: Update, context: CallbackContext) -> None:
     if('cid' not in context.chat_data):
-        chat_id = update.message.chat_id
-        context.chat_data['cid'] = chat_id
         update.message.reply_text(
             f'Please use /start to begin tracking'
         )
@@ -246,6 +253,12 @@ def generate_msg_text(Cases,con):
     return msg_text
 
 def addCaseType(update: Update, context: CallbackContext) -> int:
+    if('cid' not in context.chat_data):
+        update.message.reply_text(
+            f'Please use /start to begin tracking'
+        )
+        return ConversationHandler.END
+    
     logger.info('prompting for case type')  
     context.user_data.clear()
     command_msg = update.message.message_id
@@ -373,16 +386,27 @@ def cancelAdd(update: Update, context: CallbackContext) -> int:
         bot.delete_message(chat_id=update.message.chat_id, message_id=msgid)
     else:
         if('msgid' in context.user_data):
-            bot.delete_message(chat_id=update.message.chat_id, message_id=context.user_data['msgid'])
+            try:
+                bot.delete_message(chat_id=update.message.chat_id, message_id=context.user_data['msgid'])
+            except:
+                pass
         bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
     
     logger.info('User cancelled this action')
-    bot.delete_message(chat_id=update.message.chat_id, message_id=context.user_data['com_msgid'])
+    try:
+        bot.delete_message(chat_id=update.message.chat_id, message_id=context.user_data['com_msgid'])
+    except:
+        pass
     context.user_data.clear()
     return ConversationHandler.END
 
 
 def remCaseType(update: Update, context: CallbackContext) -> int:
+    if('cid' not in context.chat_data):
+        update.message.reply_text(
+            f'Please use /start to begin tracking'
+        )
+        return ConversationHandler.END
     logger.info('prompting for case type')  
     context.user_data.clear()
     command_msg = update.message.message_id
@@ -509,9 +533,21 @@ def dOff(update: Update, context: CallbackContext) -> None:
     return 
 
 def clear(update: Update, context: CallbackContext) -> None:
+    if('cid' not in context.chat_data):
+        update.message.reply_text(
+            f'Please use /start to begin tracking'
+        )
+        return ConversationHandler.END
     logger.info('clear list')
     if('Cases' in context.chat_data):
         Cases = context.chat_data['Cases']
+    else:
+        Cases = {
+            CPos:{},
+            APos:{},
+            Hrn:{},
+            CCon:{},
+        }
     for ctype in range(4):
         Cases[ct[ctype]].clear()
     context.chat_data['Cases'] = Cases
@@ -531,7 +567,10 @@ def reset(update: Update, context: CallbackContext) -> None:
     logger.info('clear list')
     context.chat_data.clear()
     bot = context.bot
-    bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+    try:
+        bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+    except:
+        pass
     bot.send_message(chat_id=update.message.chat_id, text='Chat reset. Please use /start to resume')
     return 
 
@@ -563,8 +602,8 @@ def error_handler(update: object, context: CallbackContext) -> None:
 
 def main() -> None:
     # Set these variable to the appropriate values
-    TOKEN = "YOUR_TELEGRAM_TOKEN"
-    N = "covidtracker-bot-12"
+    TOKEN = "your-telegram-token"
+    N = "your-heroku-app"
 
     # Port is given by Heroku
     PORT = os.environ.get('PORT','5555')
