@@ -602,8 +602,8 @@ def error_handler(update: object, context: CallbackContext) -> None:
 
 def main() -> None:
     # Set these variable to the appropriate values
-    TOKEN = "your-telegram-token"
-    N = "your-heroku-app"
+    TOKEN = os.environ['TELE_BOT_TOKEN']
+    N = 'covidtracker-bot-12'
 
     # Port is given by Heroku
     PORT = os.environ.get('PORT','5555')
