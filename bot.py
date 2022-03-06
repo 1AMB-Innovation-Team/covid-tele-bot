@@ -85,15 +85,16 @@ def start(update: Update, context: CallbackContext) -> None:
     logger.info('User %s started the conversation.', user.first_name)
     bot = context.bot
     chat_id = update.message.chat_id
-    admins = bot.get_chat_administrators(chat_id)
-    if(bot.id not in [a.user.id for a in admins]):
-        update.message.reply_text(
-            f'Please grant admin permissions to this bot, then use /start to begin tracking'
-        )        
-        logger.info('Bot id %s', bot.id)
-        logger.info('admins %s', str(admins))
-        logger.info('Bot has no admin rights in chat %s', chat_id)
-        return
+    if(update.message.chat.type!='private'):
+        admins = bot.get_chat_administrators(chat_id)
+        if(bot.id not in [a.user.id for a in admins]):
+            update.message.reply_text(
+                f'Please grant admin permissions to this bot, then use /start to begin tracking'
+            )        
+            logger.info('Bot id %s', bot.id)
+            logger.info('admins %s', str(admins))
+            logger.info('Bot has no admin rights in chat %s', chat_id)
+            return
     logger.info('context: %s', context)
     # load current case list from persistence store
     if('Cases' not in context.chat_data):
@@ -179,7 +180,7 @@ def unitName(update: Update, context: CallbackContext) -> None:
             )
         except:
             pass
-    bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
+    bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.messetge_id)
     return 
 
 def generate_category_list(cdict, ctype, context):
@@ -455,9 +456,7 @@ def remCaseName(update: Update, context: CallbackContext) -> int:
             pass
         return TYPE
     keyboard = [
-        [
-            InlineKeyboardButton(str(name), callback_data=str(name)) for name in Cases[ct[int(ctype)]].keys()
-        ]
+            [InlineKeyboardButton(str(name), callback_data=str(name))] for name in Cases[ct[int(ctype)]].keys()
     ]   
     reply_markup = InlineKeyboardMarkup(keyboard)
     query.edit_message_text(
@@ -683,10 +682,6 @@ def main() -> None:
                           webhook_url=f"https://{N}.herokuapp.com/{TOKEN}")
     
     # updater.start_polling()
-    '''updater.start_webhook(listen="0.0.0.0",
-                            port=int(PORT),
-                            url_path=TOKEN)
-    updater.bot.setWebhook('https://covidtracker-bot-12.herokuapp.com/' + TOKEN)'''
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
