@@ -601,17 +601,19 @@ def error_handler(update: object, context: CallbackContext) -> None:
 
 def main() -> None:
     # Set these variable to the appropriate values
-    TOKEN = os.environ['TELE_BOT_TOKEN']
+    # TOKEN = os.environ['TELE_BOT_TOKEN']
+    TOKEN = '5199892781:AAFGg8DUqEouJ4gi9o-pQVD-9JG1hRMtYWU'
     N = 'covidtracker-bot-12'
 
     # Port is given by Heroku
     PORT = os.environ.get('PORT','5555')
     '''Run the bot.'''
     # Create the Updater and pass it your bot's token.
-    DATABASE_URL = os.environ['DATABASE_URL']
-    DB_URL = DATABASE_URL.replace('postgres','postgresql',1)
+    # DATABASE_URL = os.environ['DATABASE_URL']
+    # DB_URL = DATABASE_URL.replace('postgres','postgresql',1)
         
-    pers = PostgresPersistence(url=DB_URL)
+    # pers = PostgresPersistence(url=DB_URL)
+    pers = PicklePersistence('filename.pkl')
     updater = Updater(TOKEN, persistence=pers)
 
     # Get the dispatcher to register handlers
@@ -676,12 +678,12 @@ def main() -> None:
     # Start the Bot
     
     # Start the webhook
-    updater.start_webhook(listen="0.0.0.0",
-                          port=int(PORT),
-                          url_path=TOKEN,
-                          webhook_url=f"https://{N}.herokuapp.com/{TOKEN}")
+    # updater.start_webhook(listen="0.0.0.0",
+    #                       port=int(PORT),
+    #                       url_path=TOKEN,
+    #                       webhook_url=f"https://{N}.herokuapp.com/{TOKEN}")
     
-    # updater.start_polling()
+    updater.start_polling()
     # Run the bot until you press Ctrl-C or the process receives SIGINT,
     # SIGTERM or SIGABRT. This should be used most of the time, since
     # start_polling() is non-blocking and will stop the bot gracefully.
