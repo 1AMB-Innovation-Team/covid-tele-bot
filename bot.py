@@ -37,7 +37,7 @@ logger = logging.getLogger(__name__)
 
 # Stages
 # FIRST, SECOND = range(2)
-TYPE, NAME, DATE = range(3)
+TYPE, DUR, NAME, PLT, DATE = range(5)
 # Callback data
 # ONE, TWO, THREE, FOUR = range(4)
 CP, AP, HR, CC = range(4)
@@ -45,6 +45,7 @@ NM, MC = range(2)
 # dict keys
 CPos, APos, Hrn, CCon = 'c','a','h','k'
 ct = [CPos, APos, Hrn, CCon]
+
 type_text = [
     'C+ on ',
     'HA Ag+ on ',
@@ -198,8 +199,8 @@ def generate_category_list(cdict, ctype, context):
         index = i[0]
         rname = i[1][0]
         datestr = i[1][1][0]
-        mc = i[1][1][1]
-        mctext = ['Isolate at home till','5 days MC till']
+        mc = str(i[1][1][1])
+        mctext = ['Isolate at home till','days MC till']
         cdate = dateparser.parse(datestr, settings={'DATE_ORDER': 'DMY'})
         day5 = cdate + datetime.timedelta(days=4)
         day7 = cdate + datetime.timedelta(days=6)
@@ -215,10 +216,19 @@ def generate_category_list(cdict, ctype, context):
         d7 = day7.strftime('%d %b')
         clist_text += f'{str(index)}. {str(rname)}\n'
         if(ctype == 0 or ctype == 1):
-            clist_text += (
-                f'{ttext}{cd}. {mctext[mc]} {d5} (D5).\n'
-                f'WFH till {d7} (D7) if ART positive on D5.\n\n'
-            )
+            if(len(mc)>1):
+                mcdur = int(mc[1:])
+                dayx = cdate + datetime.timedelta(days=(mcdur-1))
+                dx = dayx.strftime('%d %b')
+                clist_text += (
+                    f'{ttext}{cd}. {str(mcdur)} {mctext[1]} {dx}.\n'
+                    f'WFH till {d7} (D7) if ART positive on D5.\n\n'
+                )
+            else:
+                clist_text += (
+                    f'{ttext}{cd}. {mctext[0]} {d5} (D5).\n'
+                    f'WFH till {d7} (D7) if ART positive on D5.\n\n'
+                )
         elif(ctype == 2 or ctype == 3):
             clist_text += (
                 f'{ttext}{cd}. WFH from {cd} (D1) till {d5} (D5).\n\n'
@@ -298,30 +308,65 @@ def mcStatus(update: Update, context: CallbackContext) -> int:
     )
     return TYPE
 
+def mcDuration(update: Update, context: CallbackContext) -> int:
+    """Show new choice of buttons"""
+    query = update.callback_query
+    ctype = str(query.data)
+    logger.info('Case submitted with type %s.', str(ctype))
+    query.answer()
+    keyboard = [
+        [
+            InlineKeyboardButton(f'{str(x)}', callback_data=str(ctype)+str(x)) for x in range(3,8)
+        ]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query.edit_message_text(
+        text="Select MC Duration:", reply_markup=reply_markup
+    )
+    return TYPE
+
 def addCaseName(update: Update, context: CallbackContext) -> int:
     '''Show new choice of buttons'''
     query = update.callback_query
-    ctype = query.data
+    ct = str(query.data)
+    logger.info('Case submitted with type %s.', str(ct))
+    query.answer()
+    context.user_data['case_type'] = int(ct)
+    ctype = context.user_data['case_type']
     if(len(ctype)==1):
         logger.info('Case submitted with type %s.', str(ctype))  
         context.user_data['case_type'] = int(ctype)
         context.user_data['mc_type'] = int(NM)
-    elif(len(ctype)==2):
+    elif(len(ctype)>=2):
         context.user_data['case_type'] = int(ctype[0])
         logger.info('Case submitted with type %s with MC option %s.', str(ctype[0]), str(ctype[1]))  
-        context.user_data['mc_type'] = int(ctype[1])
+        context.user_data['mc_type'] = int(ctype[1:])
+        
     query.answer()
     query.edit_message_text(
         text='Enter case rank & name:'
     )
     return NAME
 
-def addCaseDate(update: Update, context: CallbackContext) -> int:
-    
-    logger.info('at date prompt')
+def plt(update: Update, context: CallbackContext) -> int:
+    logger.info('at plt prompt')
     cname = update.message.text
     context.user_data['case_name'] = str(cname)
     logger.info('Case submitted with name %s.', str(cname))
+    """Show new choice of buttons"""
+    bot = context.bot
+    bot.edit_message_text(
+        text="Enter case platoon", chat_id=update.message.chat_id, message_id=context.user_data['msgid']
+    )
+    return PLT
+
+
+def addCaseDate(update: Update, context: CallbackContext) -> int:
+    logger.info('at date prompt')
+    pl = update.message.text
+    context.user_data['plt'] = str(pl)
+    logger.info('Case submitted with name %s.', str(pl))
+    
     bot = context.bot
     prompt_text = 'Enter case date:'
     try:
@@ -356,6 +401,7 @@ def caseDateHandler(update: Update, context: CallbackContext) -> int:
     ctype = context.user_data['case_type']
     cname = context.user_data['case_name']
     mc = context.user_data['mc_type']
+    
     # lmao wtf is code readability
     # uses rank name of case as key for date
     # double nested dict because i have no brain
@@ -623,11 +669,17 @@ def main() -> None:
         states={
             TYPE: [
                 CallbackQueryHandler(mcStatus, pattern='^['+str(CP)+str(AP)+']$'),
+                CallbackQueryHandler(mcDuration, pattern=
+                    '^['+str(CP)+str(AP)+']'+str(MC)+'$'
+                ),
                 CallbackQueryHandler(addCaseName, pattern=
-                    '^['+str(HR)+str(CC)+']$|^['+str(CP)+str(AP)+']['+str(NM)+str(MC)+']$'
+                    '^['+str(HR)+str(CC)+']$|^['+str(CP)+str(AP)+']['+str(NM)+str(MC)+'][3-8]*$'
                 ),
             ],
             NAME: [
+                MessageHandler(Filters.text & ~Filters.command, plt)
+            ],
+            PLT:   [
                 MessageHandler(Filters.text & ~Filters.command, addCaseDate)
             ],
             DATE:   [
