@@ -332,7 +332,7 @@ def addCaseName(update: Update, context: CallbackContext) -> int:
     logger.info('Case submitted with type %s.', str(ct))
     query.answer()
     context.user_data['case_type'] = int(ct)
-    ctype = context.user_data['case_type']
+    ctype = str(context.user_data['case_type'])
     if(len(ctype)==1):
         logger.info('Case submitted with type %s.', str(ctype))  
         context.user_data['case_type'] = int(ctype)
