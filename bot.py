@@ -403,7 +403,7 @@ def caseDateHandler(update: Update, context: CallbackContext) -> int:
     ctype = context.user_data['case_type']
     cname = context.user_data['case_name']
     mc = context.user_data['mc_type']
-    plt = context.user_Data['plt']
+    plt = context.user_data['plt']
     # lmao wtf is code readability
     # uses rank name of case as key for date
     # double nested dict because i have no brain
