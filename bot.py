@@ -200,6 +200,7 @@ def generate_category_list(cdict, ctype, context):
         rname = i[1][0]
         datestr = i[1][1][0]
         mc = str(i[1][1][1])
+        plt = i[1][1][2]
         mctext = ['Isolate at home till','days MC till']
         cdate = dateparser.parse(datestr, settings={'DATE_ORDER': 'DMY'})
         day5 = cdate + datetime.timedelta(days=4)
@@ -214,7 +215,7 @@ def generate_category_list(cdict, ctype, context):
         cd = cdate.strftime('%d %b')
         d5 = day5.strftime('%d %b')
         d7 = day7.strftime('%d %b')
-        clist_text += f'{str(index)}. {str(rname)}\n'
+        clist_text += f'{str(index)}. {str(rname)} from {str(plt)}\n'
         if(ctype == 0 or ctype == 1):
             if(len(mc)>1):
                 mcdur = int(mc[1:])
@@ -402,14 +403,14 @@ def caseDateHandler(update: Update, context: CallbackContext) -> int:
     ctype = context.user_data['case_type']
     cname = context.user_data['case_name']
     mc = context.user_data['mc_type']
-    
+    plt = context.user_Data['plt']
     # lmao wtf is code readability
     # uses rank name of case as key for date
     # double nested dict because i have no brain
     # Cases = load_cases()
     if('Cases' in context.chat_data):
         Cases = context.chat_data['Cases']
-    Cases[ct[ctype]][cname]=[cdt.strftime('%d/%m/%Y'),mc]
+    Cases[ct[ctype]][cname]=[cdt.strftime('%d/%m/%Y'),mc,plt]
     context.chat_data['Cases'] = Cases
     
     # Edit active list
