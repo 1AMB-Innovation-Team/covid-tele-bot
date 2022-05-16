@@ -358,6 +358,7 @@ def plt(update: Update, context: CallbackContext) -> int:
     bot.edit_message_text(
         text="Enter case platoon", chat_id=update.message.chat_id, message_id=context.user_data['msgid']
     )
+    bot.delete_message(chat_id=update.message.chat_id, message_id=update.message.message_id)
     return PLT
 
 
